@@ -1,4 +1,4 @@
-EXEC = exec 
+EXEC = ./build/exec 
 SRC_DIR = ./src
 INCLUDE_DIR = ./include
 BUILD_DIR = ./build
@@ -22,6 +22,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@$(CC) $(CFLAGS) $< -o $@
 
 run: build
+	@echo "[ run ]"
 	@./$(EXEC)
 
 clean:
