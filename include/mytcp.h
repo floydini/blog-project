@@ -8,7 +8,7 @@
 using namespace std;
 
 #ifndef MAXLEN
-#define MAXLEN 4096
+#define MAXLEN 1048576
 #endif
 
 #ifndef BACKLOG
@@ -17,7 +17,8 @@ using namespace std;
 
 
 class TCP {
-  private:
+//  private:
+  public:
 	int fd, client_fd;
 	struct sockaddr_in addr, client_addr;
   public:
@@ -32,9 +33,15 @@ class TCP {
 
 		bind(fd, (sockaddr*)&addr, sizeof(addr));
 		listen(fd, BACKLOG);
+		client_fd=-1;
+	}
+	~TCP(){
+		if(fd != -1) close(fd);
+		if(client_fd != -1) close(client_fd);
 	}
 
 	bool ac() {
+		if(client_fd != -1) close(client_fd);
 		socklen_t len = sizeof(client_addr);
 		client_fd = accept(fd, (sockaddr*)&client_addr, &len);
 		if (client_fd != -1)
@@ -43,14 +50,15 @@ class TCP {
 		return false;
 	}
 
-	void in(char buf[]) {
-		if (recv(client_fd, buf, MAXLEN, 0) == MAXLEN)
-			printf("The buf may overflow!\n");
+	int in(char buf[]) {
+		int len = recv(client_fd, buf, MAXLEN, 0);
+		if (len == 0) printf("Empty message (Ignored)\n");
+		if (len == MAXLEN) printf("The buf may overflow!\n");
+		return len;
 	}
 
-	void out(char data[]) {
+	void out(char data[], int len) {
 		char *tmp = data;
-		int len = strlen(data);
 		while (len) {
 			int aclen = send(client_fd, tmp, len, 0);
 			if (aclen == -1) {
@@ -62,5 +70,10 @@ class TCP {
 		}
 	}
 
+//	friend TCP operator<<(TCP& tout, char data[]);
 };
 
+//TCP operator<<(TCP& tout, char data[]) {
+//	tout.out(data);
+//	return tout;
+//}

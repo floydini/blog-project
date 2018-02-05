@@ -7,52 +7,80 @@
 #include<cstring>
 #include<sstream>
 #include<fstream>
+#include<regex>
 
 #include"mytcp.h"
+#include"myhttp.h"
 using namespace std;
 
-stringstream ss;
-fstream ff;
-
-
-void pack(char a[]) {
-	int len;
-	ss.clear();
-	ss << strlen(a) - 1;
-	ss >> len;
-	char tmp[MAXLEN];
-	sprintf(tmp, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n%s\n", len, a);
-	strcpy(a, tmp);
-}
-
-void get_data(char a[], char b[]) {
-	ff.clear();
-	ff.open(a);
-	ff.seekg(0, std::ios::end);
-	int len = ff.tellg();
-	ff.seekg(0, std::ios::beg);
-	ff.read(b, len);
-	ff.close();
-}
 
 
 #ifndef MAXLEN
-#define MAXLEN 4096
+#define MAXLEN 1048576
 #endif
 
-char a[MAXLEN], b[MAXLEN];
+
+#define Log(format, ...) \
+	do { \
+		fprintf(stdout, "\33[1;34m[%s,%d,%s] " format "\33[0m", \
+				__FILE__, __LINE__, __func__, ## __VA_ARGS__); \
+		fflush(stdout);\
+	} while (0)
+
+
+/*
+void sol(char req[], char data[]) {
+	char method[128];
+
+	ss.str("");
+	ss.clear();
+	ss << req;
+	ss >> method;
+	cout << "method = " << method << endl;
+	if (strcmp(method, "GET") == 0) {
+		ss >> filename;
+		if (strcmp(filename, "/") == 0) strcpy(filename, "/index.html");
+		ss.str("");
+		ss.clear();
+		ss << path << filename;
+		ss >> filename;
+	}
+	cout << "filename = " << filename << endl;
+	get_data(filename, data);
+	pack(data);
+}*/
+
+char req[MAXLEN], head[MAXLEN], data[MAXLEN];
 
 int main() {
 
-	strcpy(a, "helloworld!!!");
-	pack(a);
+//	get_data(filename, data);
+//	pack(data);
 
 	TCP server(8080);
+	cout << "OK\n";
 
 	while (server.ac()) {
-		server.in(b);
-		cout << "receive :\n" << b;
-		server.out(a);
+		int fpid = fork();
+		if (fpid < 0) Log("fork error\n");
+		else if (fpid == 0) {
+			Log("fork_pid = %d\n", getpid());
+			Log("client_fd = %d\n", server.client_fd);
+
+			int rclen = server.in(req);
+			if(rclen != 0) {
+				Log("receive complete\n");
+				cout << req;
+				int len = get_content(req, head, data);
+//				server << data;
+				int hlen = strlen(head);
+				for (int i = 0; i < len; i++) head[hlen + i] = data[i];
+				server.out(head, hlen + len);
+				Log("send complete\n");
+			}
+			return EXIT_SUCCESS;
+		}
 	}
+
 	return 0;
 }
