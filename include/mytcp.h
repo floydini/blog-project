@@ -17,11 +17,10 @@ using namespace std;
 
 
 class TCP {
-//  private:
   public:
 	int fd, client_fd;
 	struct sockaddr_in addr, client_addr;
-  public:
+	
 	TCP(int port) {
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(port);

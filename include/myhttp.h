@@ -69,8 +69,11 @@ bool IsBinary(char *type) {
 }
 
 void add(int a, int b) {
+	ff.open("website/add.html",ios::out|ios::trunc);
+	ff.close();
 	ff.open("website/add.html");
 	ff << a << " + " << b << " = " << a + b << endl;
+	cout << a << " + " << b << " = " << a + b << endl;
 	ff.close();
 }
 
@@ -83,13 +86,19 @@ int get_content(char *req, char* head, char* data) {
 	ss >> method;
 	if (strcmp(method, "GET") == 0) {
 		ss >> filename;
-		cmatch cm;
-		regex re("(.*)\\.(.*)");
+		cmatch cm, cm_add;
+		regex re("(.*)\\.(.*)"),re_add("/add/([0-9]+)/([0-9]+)");
 		if (strcmp(filename, "/") == 0) strcpy(filename, "/index.html");
-		/*		else if (strcmp(filename, "/add/([0-9]+)/([0-9]+)") == 0) {
-					strcpy(filename, "/add.html");
-					add(stoi(cm[1]), stoi(cm[2]));
-				} */
+		else if (regex_match(filename,cm_add,re_add)) {
+			int a1,a2;
+			ss.str("");
+			ss.clear();
+			cout <<cm_add.str(1) <<" | "<< cm_add.str(2)<<endl;
+			ss << cm_add.str(1) <<" "<< cm_add.str(2);
+			ss >> a1 >> a2;
+			add(a1,a2);
+			strcpy(filename, "/add.html");
+		}
 
 		if (regex_match(filename, cm, re)) {
 			string tt = cm.str(2);
@@ -103,6 +112,7 @@ int get_content(char *req, char* head, char* data) {
 	} else if (strcmp(method, "POST") == 0) {
 		//TODO
 		cout << "method POST !\n";
+		cout << req <<endl;
 	} else cout << "Should not reach here ! (method : " << method << ")\n";
 
 	cout << "filename = " << filename << endl;
@@ -110,55 +120,3 @@ int get_content(char *req, char* head, char* data) {
 	pack(type, head, data, len);
 	return len;
 }
-
-
-// class Response {
-//   private:
-// 	char *filename;
-// 	char *filetype;
-//   public:
-// 	Response() {
-// 		HTTP_Version["0"] = "HTTP/1.1";
-
-// 		Status_Code["OK"] = "200 OK";
-// 		Status_Code["NF"] = "404 Not Found";
-// 		Status_Code["NA"] = "406 Not Acceptable";
-// 		Status_Code["SU"] = "503 Service Unavailable";
-
-// 		Reason_Phrase[""]
-// 	};
-// 	void name(char *file) {
-// 		strcpy(filename, file);
-// 	}
-// 	char *Content_Type() {
-// 		int sz = strlen(filename);
-// 		while (sz > 0 && filename[sz - 1] != '.') sz--;
-// 		char * suffix = filename + sz;
-// 		switch (suffix) {
-// 		case "jpeg": 	{filetype = "image/jpeg"; break;}
-// 		case "png": 	{filetype = "image/png"; break;}
-// 		default: 		{filetype = "application/octet-stream"; break;}
-// 		}
-// 	}
-
-// 	void get_data(char b[]) {
-// 		ff.open(filename);
-// 		ff.seekg(0, std::ios::end);
-// 		int len = ff.tellg();
-// 		if (len > 0) {
-// 			ff.seekg(0, std::ios::beg);
-// 			ff.read(b, len);
-// 		} else strcpy(b, " ");
-
-// 		ff.close();
-// 	}
-
-
-// 	char *Content_Length(char *filename) {
-
-// 	}
-
-// 	~Response();
-
-// };
-

@@ -27,35 +27,9 @@ using namespace std;
 		fflush(stdout);\
 	} while (0)
 
-
-/*
-void sol(char req[], char data[]) {
-	char method[128];
-
-	ss.str("");
-	ss.clear();
-	ss << req;
-	ss >> method;
-	cout << "method = " << method << endl;
-	if (strcmp(method, "GET") == 0) {
-		ss >> filename;
-		if (strcmp(filename, "/") == 0) strcpy(filename, "/index.html");
-		ss.str("");
-		ss.clear();
-		ss << path << filename;
-		ss >> filename;
-	}
-	cout << "filename = " << filename << endl;
-	get_data(filename, data);
-	pack(data);
-}*/
-
 char req[MAXLEN], head[MAXLEN], data[MAXLEN];
 
 int main() {
-
-//	get_data(filename, data);
-//	pack(data);
 
 	TCP server(8080);
 	cout << "OK\n";
