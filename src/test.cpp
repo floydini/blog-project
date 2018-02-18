@@ -33,7 +33,7 @@ int main() {
 			int rclen = server.in(req);
 			if(rclen != 0) {
 				Log("receive complete\n");
-				cout << req;
+//				cout << req;
 				int len = get_content(req, head, data);
 //				server << data;
 				int hlen = strlen(head);

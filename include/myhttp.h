@@ -24,8 +24,6 @@ void pack(char* type, char *head, char* data, int len) {
 }
 
 int get_data(bool isBinary, char a[], char b[]) {
-	cout << "isBinary = " << isBinary << endl;
-	cout << "ff.open(" << a << ")\n";
 	if (isBinary) ff.open(a, ios::in | ios::binary | ios::app);
 	else ff.open(a);
 	ff.seekg(0, std::ios::end);
@@ -81,7 +79,6 @@ int get_content(char *req, char* head, char* data) {
 			int a1, a2;
 			ss.str("");
 			ss.clear();
-			cout << cm_add.str(1) << " | " << cm_add.str(2) << endl;
 			ss << cm_add.str(1) << " " << cm_add.str(2);
 			ss >> a1 >> a2;
 			add(a1, a2);
@@ -92,7 +89,6 @@ int get_content(char *req, char* head, char* data) {
 			string tt = cm.str(2);
 			type = Content_Type.find(tt)->second;
 		} else type = (char*)"text/plain";
-		cout << "type = " << type << endl;
 		ss.str("");
 		ss.clear();
 		ss << path << filename;
