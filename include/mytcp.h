@@ -7,14 +7,7 @@
 #include<cstring>
 using namespace std;
 
-#ifndef MAXLEN
-#define MAXLEN 1048576
-#endif
-
-#ifndef BACKLOG
-#define BACKLOG 10
-#endif
-
+#include"conf.h"
 
 class TCP {
   public:

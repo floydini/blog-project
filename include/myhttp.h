@@ -5,35 +5,12 @@
 #include<sstream>
 #include<fstream>
 
-#define SP " "
-#define CRLF "\r\n"
+#include"Type.h"
 
-#ifndef MAXLEN
-#define MAXLEN 1048576
-#endif
+#include"conf.h"
 
 stringstream ss;
 fstream ff;
-
-
-const char* HTTP_Version = "HTTP/1.1";
-const char* path = "website";
-const map<int, char*> Status_Code = {
-	{200, (char*)"200 OK"},
-	{404, (char*)"404 Not Found"},
-	{503, (char*)"503 Service Unavailable"}
-};
-
-const map<string, char*> Content_Type = {
-	{"html"	, (char*)"text/html"},
-	{"plain", (char*)"text/plain"},
-	{"xml"	, (char*)"text/xml"},
-	{"css"	, (char*)"text/css"},
-	{"gif"	, (char*)"image/gif"},
-	{"jpeg"	, (char*)"image/jpeg"},
-	{"png"	, (char*)"image/png"},
-	{"ico"	, (char*)"image/x-icon"}
-};
 
 void pack(char* type, char *head, char* data, int len) {
 	char* state =  Status_Code.find((len == 0) ? 404 : 200)->second;
@@ -69,7 +46,7 @@ bool IsBinary(char *type) {
 }
 
 void add(int a, int b) {
-	ff.open("website/add.html",ios::out|ios::trunc);
+	ff.open("website/add.html", ios::out | ios::trunc);
 	ff.close();
 	ff.open("website/add.html");
 	ff << a << " + " << b << " = " << a + b << endl;
@@ -86,17 +63,28 @@ int get_content(char *req, char* head, char* data) {
 	ss >> method;
 	if (strcmp(method, "GET") == 0) {
 		ss >> filename;
+		{
+			//this is temporary.
+			int tmp = strlen(filename);
+			for (int i = 0; i < tmp; i++) {
+				if (filename[i] == '?') {
+					filename[i] = '\0';
+					break;
+				}
+			}
+		}
+
 		cmatch cm, cm_add;
-		regex re("(.*)\\.(.*)"),re_add("/add/([0-9]+)/([0-9]+)");
+		regex re("(.*)\\.(.*)"), re_add("/add/([0-9]+)/([0-9]+)");
 		if (strcmp(filename, "/") == 0) strcpy(filename, "/index.html");
-		else if (regex_match(filename,cm_add,re_add)) {
-			int a1,a2;
+		else if (regex_match(filename, cm_add, re_add)) {
+			int a1, a2;
 			ss.str("");
 			ss.clear();
-			cout <<cm_add.str(1) <<" | "<< cm_add.str(2)<<endl;
-			ss << cm_add.str(1) <<" "<< cm_add.str(2);
+			cout << cm_add.str(1) << " | " << cm_add.str(2) << endl;
+			ss << cm_add.str(1) << " " << cm_add.str(2);
 			ss >> a1 >> a2;
-			add(a1,a2);
+			add(a1, a2);
 			strcpy(filename, "/add.html");
 		}
 
@@ -112,7 +100,7 @@ int get_content(char *req, char* head, char* data) {
 	} else if (strcmp(method, "POST") == 0) {
 		//TODO
 		cout << "method POST !\n";
-		cout << req <<endl;
+		cout << req << endl;
 	} else cout << "Should not reach here ! (method : " << method << ")\n";
 
 	cout << "filename = " << filename << endl;

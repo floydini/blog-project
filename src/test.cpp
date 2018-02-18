@@ -13,19 +13,8 @@
 #include"myhttp.h"
 using namespace std;
 
+#include"conf.h"
 
-
-#ifndef MAXLEN
-#define MAXLEN 1048576
-#endif
-
-
-#define Log(format, ...) \
-	do { \
-		fprintf(stdout, "\33[1;34m[%s,%d,%s] " format "\33[0m", \
-				__FILE__, __LINE__, __func__, ## __VA_ARGS__); \
-		fflush(stdout);\
-	} while (0)
 
 char req[MAXLEN], head[MAXLEN], data[MAXLEN];
 
